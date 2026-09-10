@@ -1,141 +1,70 @@
-"""
-Dataset splitting utilities for train / validation / test sets.
-
-Default ratio: 70 % train, 15 % validation, 15 % test.
-Splitting is **stratified** — each class keeps roughly the same proportion
-across all three sets — and reproducible via an optional random seed.
-"""
-
 import numpy as np
 
+def train_val_test_split(images, labels, seed=42):
 
-def train_val_test_split(
-    images: np.ndarray,
-    labels: np.ndarray,
-    train_ratio: float = 0.70,
-    val_ratio: float = 0.15,
-    test_ratio: float = 0.15,
-    seed: int | None = 42,
-) -> dict[str, dict[str, np.ndarray]]:
-    """Split images and labels into train, validation, and test sets.
-
-    The split is **stratified**: for every unique label the samples are
-    shuffled independently and divided according to the requested ratios,
-    so each set mirrors the overall class distribution.
-
-    Parameters
-    ----------
-    images : np.ndarray, shape (N, ...)
-        Image data — any shape whose first axis is the sample axis.
-    labels : np.ndarray, shape (N,) or (N, C)
-        If 1-D, treated as integer class labels.
-        If 2-D (one-hot encoded), the argmax along axis 1 is used for
-        stratification, and the original one-hot array is split.
-    train_ratio : float
-        Fraction of data for training (default 0.70).
-    val_ratio : float
-        Fraction of data for validation (default 0.15).
-    test_ratio : float
-        Fraction of data for testing (default 0.15).
-    seed : int or None
-        Random seed for reproducibility (default 42).
-
-    Returns
-    -------
-    dict with keys ``"train"``, ``"val"``, ``"test"``, each mapping to a
-    dict with ``"images"`` and ``"labels"`` arrays.
-
-    Raises
-    ------
-    ValueError
-        If the ratios do not sum to 1.0 (within floating-point tolerance)
-        or if images and labels have mismatched sample counts.
-    """
-    # ── Validate inputs ──────────────────────────────────────────────
-    if not np.isclose(train_ratio + val_ratio + test_ratio, 1.0):
-        raise ValueError(
-            f"Ratios must sum to 1.0, got "
-            f"{train_ratio} + {val_ratio} + {test_ratio} = "
-            f"{train_ratio + val_ratio + test_ratio:.4f}"
-        )
-
-    if images.shape[0] != labels.shape[0]:
-        raise ValueError(
-            f"images and labels must have the same number of samples, "
-            f"got {images.shape[0]} vs {labels.shape[0]}"
-        )
-
-    # ── Determine integer class ids for stratification ───────────────
-    if labels.ndim == 2:
-        # One-hot encoded → use argmax as the stratification key
-        class_ids = np.argmax(labels, axis=1)
-    else:
-        class_ids = labels
-
+    # Get class number from one-hot labels
+    class_labels = np.argmax(labels, axis=0)
     rng = np.random.default_rng(seed)
-    unique_classes = np.unique(class_ids)
+    train_index = []
+    val_index = []
+    test_index = []
 
-    train_idx: list[int] = []
-    val_idx: list[int] = []
-    test_idx: list[int] = []
+    # Do the split for each class
+    for c in range(35):
+        # Find all images of this class
+        indexes = np.where(class_labels == c)[0]
+        # Shuffle the indexes
+        rng.shuffle(indexes)
+        # Find how many go into each group
+        n = len(indexes)
+        train_count = int(n * 0.70)
+        val_count = int(n * 0.15)
+        # Add indexes
+        train_index.extend(indexes[:train_count])
+        val_index.extend(indexes[train_count:train_count + val_count])
+        test_index.extend(indexes[train_count + val_count:])
 
-    for cls in unique_classes:
-        cls_indices = np.where(class_ids == cls)[0]
-        rng.shuffle(cls_indices)
+    # Shuffle the final groups
+    np.random.shuffle(train_index)
+    np.random.shuffle(val_index)
+    np.random.shuffle(test_index)
 
-        n = len(cls_indices)
-        n_train = int(round(n * train_ratio))
-        n_val = int(round(n * val_ratio))
-        # Remainder goes to test to guarantee no sample is lost
-        # n_test = n - n_train - n_val
+    # Get the actual data
+    train_images = images[:,train_index]
+    train_labels = labels[:,train_index]
 
-        train_idx.extend(cls_indices[:n_train])
-        val_idx.extend(cls_indices[n_train : n_train + n_val])
-        test_idx.extend(cls_indices[n_train + n_val :])
+    val_images = images[:,val_index]
+    val_labels = labels[:,val_index]
 
-    # Shuffle within each set so batches are not class-sorted
-    train_idx = np.array(train_idx)
-    val_idx = np.array(val_idx)
-    test_idx = np.array(test_idx)
-    rng.shuffle(train_idx)
-    rng.shuffle(val_idx)
-    rng.shuffle(test_idx)
+    test_images = images[:,test_index]
+    test_labels = labels[:,test_index]
 
-    result = {
-        "train": {"images": images[train_idx], "labels": labels[train_idx]},
-        "val":   {"images": images[val_idx],   "labels": labels[val_idx]},
-        "test":  {"images": images[test_idx],  "labels": labels[test_idx]},
-    }
+    print("Training data:", train_images.shape)
+    print("Validation data:", val_images.shape)
+    print("Testing data:", test_images.shape)
 
-    # ── Summary ──────────────────────────────────────────────────────
-    total = len(images)
-    print(f"[split] Total samples : {total}")
-    print(
-        f"[split] Train        : {len(train_idx):>7,}  "
-        f"({len(train_idx) / total * 100:.1f}%)"
-    )
-    print(
-        f"[split] Validation   : {len(val_idx):>7,}  "
-        f"({len(val_idx) / total * 100:.1f}%)"
-    )
-    print(
-        f"[split] Test         : {len(test_idx):>7,}  "
-        f"({len(test_idx) / total * 100:.1f}%)"
-    )
+    # check number of samples in each class
+    print("\nClass counts (Train / Validation / Test):")
 
-    return result
+    train_classes = np.argmax(train_labels, axis=0)
+    val_classes = np.argmax(val_labels, axis=0)
+    test_classes = np.argmax(test_labels, axis=0)
 
+    for c in range(35):
+        train_count = np.sum(train_classes == c)
+        val_count = np.sum(val_classes == c)
+        test_count = np.sum(test_classes == c)  
 
-# ---------------------------------------------------------------------------
-# Quick sanity check when run directly
-# ---------------------------------------------------------------------------
+        print("Class", c+1,":", train_count,"/", val_count,"/", test_count)
 
+    return train_images, train_labels, val_images, val_labels, test_images, test_labels 
+
+# Test
 if __name__ == "__main__":
-    from loader import load_data
-
-    data = load_data(flatten=True, encode_labels=False)
-    splits = train_val_test_split(data["images"], data["labels"])
-
-    for name, subset in splits.items():
-        print(f"\n{name:>10s}  images {subset['images'].shape}  "
-              f"labels {subset['labels'].shape}")
+    from loader import load_csv
+    from preprocess import preprocess
+    images, labels = load_csv()
+    images, labels = preprocess(images, labels)
+    train_images, train_labels, val_images, val_labels, test_images, test_labels = train_val_test_split(
+        images, labels
+    )
