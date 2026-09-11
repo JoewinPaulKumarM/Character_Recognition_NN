@@ -3,6 +3,8 @@
 A 35-class handwritten character recognition neural network built entirely
 from scratch using **Python and NumPy**.
 
+THE REPORT FILE PDF IS LOCATED INSIDE report folder contains all information about the project
+
 ## Objective
 
 Classify handwritten:
