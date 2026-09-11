@@ -1,7 +1,5 @@
 import numpy as np
 from activations import relu_activation, softmax_activation, relu_derivative
-# Number of neurons in each layer
-layer_dims = [784, 128, 64, 35]
 
 # Initialize weights and biases
 def initialize_parameters(layer_dims, seed=56):
@@ -76,9 +74,6 @@ def backward_pass(Y, parameters, cache):
         dZ = dA * relu_derivative(cache["Z" + str(l)])
         # Gradient of weights
         gradients["dW" + str(l)] = (np.dot(dZ,cache["A" + str(l - 1)].T))/m
-
         # Gradient of bias
-        gradients["db" + str(l)] = (
-            np.sum(dZ, axis=1, keepdims=True) / m
-        )
+        gradients["db" + str(l)] = (np.sum(dZ, axis=1, keepdims=True) / m)
     return gradients
