@@ -2,9 +2,7 @@ import sys, os
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src", "model"))
 
 import numpy as np
-# pyrefly: ignore [missing-import]
 from layers import initialize_parameters, forward_pass, backward_pass
-# pyrefly: ignore [missing-import]
 from loss import cross_entropy_loss
 
 # Tiny data: 5 samples, 3 classes (keeps the check fast)

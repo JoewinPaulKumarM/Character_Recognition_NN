@@ -3,13 +3,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src", "data"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src", "model"))
 
 import numpy as np
-# pyrefly: ignore [missing-import]
 from loader import load_csv
-# pyrefly: ignore [missing-import]
 from preprocess import preprocess
-# pyrefly: ignore [missing-import]
 from split import train_val_test_split
-# pyrefly: ignore [missing-import]
 from layers import initialize_parameters, forward_pass
 
 # Load, preprocess, split
