@@ -6,7 +6,5 @@ __pycache__/
 data/processed/*.npy
 data/trained/*.npy
 
-# Output Artifacts (optional: remove if you explicitly want figures in git)
-report/figures/*.png
-report/metrics.txt
+# Output Artifacts 
 *.pdf
