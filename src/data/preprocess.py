@@ -3,8 +3,6 @@ import numpy as np
 
 NUM_CLASSES = 35
 IMAGE_SIZE = 28
-
-
 # convert image to grayscale
 def ensure_grayscale(images):
     if images.ndim == 4 and images.shape[-1] == 3:
@@ -35,11 +33,16 @@ def flatten(images):
 
 #convert labels into one-hot encoding
 def one_hot_encode(labels, num_classes=35):
+    """Convert integer labels (1-35) to one-hot vectors.
+    Subtracts 1 because raw CSV labels start at 1, not 0."""
     labels = labels.astype(int)
     return np.eye(num_classes)[labels - 1]
 
 # complete preprocessing
 def preprocess(images, labels, num_classes=35):
+    """Full preprocessing pipeline. Output shapes are (784, m) for images
+    and (num_classes, m) for labels — columns are samples, which is what
+    the network's matrix multiplications expect."""
     # Convert flat (m, 784) into (m, 28, 28) spatial grid
     if images.ndim == 2:
         side = int(np.sqrt(images.shape[1]))
@@ -61,7 +64,6 @@ def preprocess(images, labels, num_classes=35):
     print("Pixel range:", images.min(), "to", images.max())
 
     return images, labels
-
 
 if __name__ == "__main__":
     images, labels = load_csv()

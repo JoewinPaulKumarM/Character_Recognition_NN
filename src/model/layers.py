@@ -3,6 +3,8 @@ from activations import relu_activation, softmax_activation, relu_derivative
 
 # Initialize weights and biases
 def initialize_parameters(layer_dims, seed=56):
+    """Create weight matrices and bias vectors for each layer.
+    Hidden layers use He init (good for ReLU), output uses Xavier (good for softmax)."""
     np.random.seed(seed)
     parameters = {}
     # Go through each layer
@@ -28,6 +30,8 @@ def initialize_parameters(layer_dims, seed=56):
 
 # Forward propagation
 def forward_pass(X, parameters):
+    """Pass input through all layers. Returns final output and cache
+    (Z and A values per layer, needed by backward_pass)."""
     A = X
     # Number of layers
     L = len(parameters) // 2
@@ -55,6 +59,10 @@ def forward_pass(X, parameters):
 
 # Backward propagation
 def backward_pass(Y, parameters, cache):
+    """Compute gradients for all weights and biases using backpropagation.
+    Starts from output layer where dZ = A_L - Y (softmax + cross-entropy shortcut),
+    then propagates error backward through each hidden layer applying the chain rule.
+    All gradients are averaged over m samples (the batch)."""
     m = Y.shape[1]
     # Number of layers
     L = len(parameters) // 2

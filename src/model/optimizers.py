@@ -2,6 +2,7 @@ import numpy as np
 
 # Gradient Descent
 def update_gd(parameters, gradients, learning_rate):
+    """Vanilla gradient descent: W -= lr * dW for each layer."""
     for l in range(1, len(parameters) // 2 + 1):
         parameters["W" + str(l)] -= (learning_rate * gradients["dW" + str(l)])
         parameters["b" + str(l)] -= (learning_rate * gradients["db" + str(l)])
@@ -16,6 +17,7 @@ def initialize_velocity(parameters):
     return v
 
 def update_momentum(parameters, gradients, v, learning_rate, beta=0.9):
+    """SGD with momentum. v is the exponentially weighted moving average of gradients."""
     for l in range(1, len(parameters) // 2 + 1):
         v["dW" + str(l)] = (beta * v["dW" + str(l)] + (1 - beta) * gradients["dW" + str(l)])
         v["db" + str(l)] = (beta * v["db" + str(l)] + (1 - beta) * gradients["db" + str(l)])
@@ -33,6 +35,7 @@ def initialize_rmsprop(parameters):
 
 
 def update_rmsprop(parameters, gradients, s, learning_rate, beta=0.999, epsilon=1e-8):
+    """RMSprop: scales learning rate per-parameter by inverse sqrt of squared gradient history."""
     for l in range(1, len(parameters) // 2 + 1):
         s["dW" + str(l)] = (beta * s["dW" + str(l)] + (1 - beta) * gradients["dW" + str(l)] ** 2)
         s["db" + str(l)] = (beta * s["db" + str(l)] + (1 - beta) * gradients["db" + str(l)] ** 2)
@@ -53,6 +56,9 @@ def initialize_adam(parameters):
 
 
 def update_adam(parameters,gradients,v,s,t,learning_rate,beta1=0.9,beta2=0.999,epsilon=1e-8):
+    """Adam optimizer. Combines momentum (v) and RMSprop (s) with bias correction.
+    t is the global step count — needed because v and s are initialized at zero,
+    so early updates would be biased toward zero without the 1/(1-beta^t) correction."""
     for l in range(1, len(parameters) // 2 + 1):
         # Momentum
         v["dW" + str(l)] = (beta1 * v["dW" + str(l)] + (1 - beta1) * gradients["dW" + str(l)])

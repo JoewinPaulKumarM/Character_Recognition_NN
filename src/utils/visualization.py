@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 
 # Show confusion matrix
 def plot_confusion_matrix(cm, class_labels=None, save_path=None):
+    """Heatmap of the confusion matrix. Color is row-normalized (shows recall
+    per class), cell text shows raw counts. Pass save_path to write to file."""
     num_classes = cm.shape[0]
     if class_labels is None:
         class_labels = [str(i) for i in range(num_classes)]
@@ -37,6 +39,9 @@ def plot_confusion_matrix(cm, class_labels=None, save_path=None):
 
 # Show images that were classified incorrectly
 def plot_misclassified(images, true, predicted, probs=None, num_show=25, class_labels=None, save_path=None):
+    """Grid of incorrectly classified images with true/predicted labels.
+    Images are (784, m) column vectors; .T on reshape corrects EMNIST orientation.
+    If probs (softmax output) is provided, shows confidence percentage."""
     # Find incorrect predictions
     wrong = np.where(true != predicted)[0]
     if len(wrong) == 0:

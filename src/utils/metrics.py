@@ -2,6 +2,8 @@ import numpy as np
 
 # Create confusion matrix
 def confusion_matrix(true, predicted, num_classes=35):
+    """Build a num_classes x num_classes matrix where matrix[i][j] = number of
+    samples with true class i that were predicted as class j."""
     matrix = np.zeros((num_classes, num_classes), dtype=int)
     for i in range(len(true)):
         matrix[true[i], predicted[i]] += 1
@@ -9,6 +11,8 @@ def confusion_matrix(true, predicted, num_classes=35):
 
 # Calculate precision, recall and F1
 def get_metrics(matrix):
+    """Extract per-class precision, recall, and F1 from a confusion matrix.
+    Returns dict mapping class index to {precision, recall, f1}."""
     num_classes = matrix.shape[0]
     metrics = {}
     for c in range(num_classes):
@@ -29,6 +33,8 @@ def get_metrics(matrix):
 
 # Calculate macro and weighted averages
 def get_averages(metrics):
+    """Macro-average: simple mean across all classes, treating each class equally
+    regardless of how many samples it has."""
     precision = []
     recall = []
     f1 = []

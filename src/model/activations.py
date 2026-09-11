@@ -13,4 +13,6 @@ def relu_activation(x):
     return Z
 
 def relu_derivative(x):
+    """Returns 1.0 where x > 0, else 0.0. Used during backprop to gate
+    which neurons pass gradient through (only the ones that fired)."""
     return (x > 0).astype(float)

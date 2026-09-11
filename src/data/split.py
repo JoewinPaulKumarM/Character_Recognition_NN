@@ -1,7 +1,8 @@
 import numpy as np
 
 def train_val_test_split(images, labels, seed=42):
-
+    """Stratified 70/15/15 split. Splits each class independently so every
+    class has proportional representation in train, val, and test."""
     # Get class number from one-hot labels
     class_labels = np.argmax(labels, axis=0)
     rng = np.random.default_rng(seed)

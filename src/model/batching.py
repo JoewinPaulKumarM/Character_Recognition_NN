@@ -1,6 +1,8 @@
 import numpy as np
 
 def get_minibatches(X, Y, batch_size, seed=None):
+    """Shuffle data and split into mini-batches. Seed changes each epoch
+    so the batches are different every time, but reproducible."""
     # Number of training examples
     m = X.shape[1]
     # Set seed if given
