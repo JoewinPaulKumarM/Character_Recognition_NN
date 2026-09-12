@@ -6,9 +6,6 @@ __pycache__/
 data/processed/*.npy
 data/trained/*.npy
 
-<<<<<<< HEAD
 # Output Artifacts 
 *.pdf
-=======
-*.pdf
->>>>>>> 2c15b8bea0e89e18035608833342ae51ccffc93d
+
