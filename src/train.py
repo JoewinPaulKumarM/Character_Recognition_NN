@@ -22,14 +22,13 @@ val_labels = np.load(os.path.join(data_dir, "val_labels.npy"))
 print("Train:", train_images.shape, train_labels.shape)
 print("Validation:", val_images.shape, val_labels.shape)
 
-
 # Network settings
 layer_dims = [784, 128, 64, 35]
 
 learning_rate = 0.001
 epochs = 50
 batch_size = 64
-lambd = 0.5  # L2 regularization strength — try 0.01, 0.1, 1.0 and compare
+lambd = 0.5  
 print(f"Learning Rate: {learning_rate}, Batch Size: {batch_size}, Lambda: {lambd}, Epochs: {epochs}")
 
 # Initialize network
